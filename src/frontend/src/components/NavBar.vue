@@ -191,6 +191,7 @@
                 v-for="(group, i) in store.groups" 
                 :key="i" 
                 clickable 
+                @click="store.setLoggedInGroup(group.id)"
                 v-close-popup 
                 :active="group.id === store.loggedInGroup.id"
                 active-class="bg-blue-3 text-bold"

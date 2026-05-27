@@ -124,6 +124,10 @@ const router = createRouter({
       component: () => import('../views/GroupsView.vue')
     },
     {
+      path: '/groups/new',
+      component: () => import('../views/CreateGroupView.vue')
+    },
+    {
       path: '/groups/admin',
       component: () => import('../views/GroupsAdminView.vue')
     },
@@ -214,7 +218,7 @@ async function callGetLoginStatus() {
   try {
     const res = await api.getLoginStatus()
     store.loggedInUser = res.data
-    store.groups = res.data.groups
+    store.setGroups(res.data.groups)
   } catch (err) {
     store.loggedInUser = ''
   }

@@ -1,18 +1,80 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
+const GROUP_STORAGE_KEY = 'dioptra_group_id'
+
+type GroupRef = {
+  id: number
+  name: string
+}
+
+function readStoredGroupId(): number | null {
+  const raw = localStorage.getItem(GROUP_STORAGE_KEY)
+  if(!raw) {
+    return null
+  }
+
+  const groupId = Number(raw)
+  return Number.isNaN(groupId) ? null : groupId
+}
+
+function writeStoredGroupId(groupId: number) {
+  localStorage.setItem(GROUP_STORAGE_KEY, String(groupId))
+}
+
+function clearStoredGroupId() {
+  localStorage.removeItem(GROUP_STORAGE_KEY)
+}
+
 export const useLoginStore = defineStore('login', () => {
   // ref()'s are state properties
   const loggedInUser = ref({});
 
-  const groups = ref([])
+  const groups = ref<GroupRef[]>([])
+  const selectedGroupId = ref<number | null>(readStoredGroupId())
 
   const loggedInGroup = computed(() => {
-    if(groups.value.length === 1) {
-      return groups.value[0]
+    if(groups.value.length === 0) {
+      return ''
     }
-    return ''
+
+    if(selectedGroupId.value !== null) {
+      const selectedGroup = groups.value.find((group) => group.id === selectedGroupId.value)
+      if(selectedGroup) {
+        return selectedGroup
+      }
+    }
+
+    selectedGroupId.value = groups.value[0].id
+    writeStoredGroupId(groups.value[0].id)
+    return groups.value[0]
   })
+
+  function setGroups(newGroups: GroupRef[]) {
+    groups.value = newGroups
+
+    if(groups.value.length === 0) {
+      selectedGroupId.value = null
+      clearStoredGroupId()
+      return
+    }
+
+    const selected = groups.value.find((group) => group.id === selectedGroupId.value)
+    if(!selected) {
+      selectedGroupId.value = groups.value[0].id
+      writeStoredGroupId(groups.value[0].id)
+    }
+  }
+
+  function setLoggedInGroup(groupId: number) {
+    const group = groups.value.find((g) => g.id === groupId)
+    if(!group) {
+      return
+    }
+
+    selectedGroupId.value = groupId
+    writeStoredGroupId(groupId)
+  }
 
 
   const users = ref([
@@ -66,5 +128,18 @@ export const useLoginStore = defineStore('login', () => {
   // function()'s are actions
   
 
-  return { loggedInUser, loggedInGroup, groups, users, savedForms, showRightDrawer, selectedSnapshot, triggerPopup, initialPage, tablePaginationCache };
+  return {
+    loggedInUser,
+    loggedInGroup,
+    groups,
+    users,
+    savedForms,
+    showRightDrawer,
+    selectedSnapshot,
+    triggerPopup,
+    initialPage,
+    tablePaginationCache,
+    setGroups,
+    setLoggedInGroup,
+  };
 })

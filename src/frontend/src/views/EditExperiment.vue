@@ -86,18 +86,11 @@
           </q-popup-edit>
         </template>
         <template #group="{ }">
-          <q-select
-            outlined 
-            v-model="experiment.group" 
-            :options="store.groups"
-            option-label="name"
-            option-value="id"
-            emit-value
-            map-options
+          <q-input
+            outlined
             dense
-            :rules="[requiredRule]"
-            aria-required="true"
-            :disable="history || experiment.deleted"
+            :model-value="groupDisplayName"
+            disable
             hide-bottom-space
           />
         </template>
@@ -245,6 +238,27 @@ const metadataRows = computed(() => [
   { label: 'Description', slot: 'description' },
   { label: 'Entrypoints', slot: 'entrypoints' },
 ])
+
+const groupDisplayName = computed(() => {
+  const groupValue = experiment.value?.group
+
+  if(groupValue && typeof groupValue === 'object' && 'name' in groupValue) {
+    return groupValue.name
+  }
+
+  const groupId = groupValue && typeof groupValue === 'object' && 'id' in groupValue
+    ? groupValue.id
+    : groupValue
+
+  if(typeof groupId === 'number') {
+    const group = store.groups.find((g) => g.id === groupId)
+    if(group) {
+      return group.name
+    }
+  }
+
+  return store.loggedInGroup.name
+})
 
 const invalidName = ref(false)
 const nameError = ref('')

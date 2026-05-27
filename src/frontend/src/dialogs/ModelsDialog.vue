@@ -22,22 +22,11 @@
         <label for="name" class="field-label">Name:</label>
       </template>
     </q-input>
-    <q-select
-      outlined 
-      v-model="group" 
-      :options="store.groups"
-      option-label="name"
-      option-value="id"
-      emit-value
-      map-options
-      dense
-      :rules="[requiredRule]"
-      id="group"
-    >
+    <q-input outlined dense :model-value="store.loggedInGroup.name" disable>
       <template #before>
-        <label for="group" class="field-label">Group:</label>
+        <label class="field-label">Group:</label>
       </template>
-    </q-select>
+    </q-input>
     <q-input
       class="col"
       v-model.trim="description"

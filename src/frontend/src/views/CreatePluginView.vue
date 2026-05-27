@@ -16,23 +16,11 @@
               <label :class="`field-label`">Name:</label>
             </template>
           </q-input>
-          <q-select
-            outlined 
-            v-model="plugin.group" 
-            :options="store.groups"
-            option-label="name"
-            option-value="id"
-            emit-value
-            map-options
-            dense
-            :rules="[requiredRule]"
-            id="pluginGroup"
-            class="q-mb-sm"
-          >
+          <q-input outlined dense :model-value="store.loggedInGroup.name" disable class="q-mb-sm">
             <template #before>
-              <label for="pluginGroup" class="field-label">Group:</label>
+              <label class="field-label">Group:</label>
             </template>
-          </q-select>
+          </q-input>
           <q-input
             v-model="plugin.description"
             outlined

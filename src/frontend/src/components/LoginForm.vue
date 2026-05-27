@@ -81,7 +81,7 @@
     try {
       const res = await api.getLoginStatus()
       store.loggedInUser = res.data
-      store.groups = res.data.groups
+      store.setGroups(res.data.groups)
     } catch(err) {
       store.loggedInUser = ''
     }

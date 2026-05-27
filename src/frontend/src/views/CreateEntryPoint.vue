@@ -57,24 +57,11 @@
               <label :class="`field-label`">Name:</label>
             </template>
           </q-input>
-          <q-select
-            outlined 
-            v-model="entryPoint.group" 
-            :options="store.groups"
-            option-label="name"
-            option-value="id"
-            emit-value
-            map-options
-            dense
-            :rules="[requiredRule]"
-            aria-required="true"
-            :disable="history || entryPoint.deleted"
-            class="q-mb-sm"
-          >
+          <q-input outlined dense :model-value="groupDisplayName" disable class="q-mb-sm">
             <template v-slot:before>
               <div class="field-label">Group:</div>
-            </template>  
-          </q-select>
+            </template>
+          </q-input>
           <ResourcePicker
             v-if="!history"
             v-model="entryPoint.queues"
@@ -602,6 +589,31 @@
     const { plugins: _1, artifactPlugins: _2, ...copyRest } = copyAtEditStart.value
     const { plugins: _3, artifactPlugins: _4, ...entryRest } = entryPoint.value
     return JSON.stringify(copyRest) !== JSON.stringify(entryRest)
+  })
+
+  const groupDisplayName = computed(() => {
+    if(route.params.id === 'new') {
+      return store.loggedInGroup.name
+    }
+
+    const groupValue = entryPoint.value?.group
+
+    if(groupValue && typeof groupValue === 'object' && 'name' in groupValue) {
+      return groupValue.name
+    }
+
+    const groupId = groupValue && typeof groupValue === 'object' && 'id' in groupValue
+      ? groupValue.id
+      : groupValue
+
+    if(typeof groupId === 'number') {
+      const group = store.groups.find((g) => g.id === groupId)
+      if(group) {
+        return group.name
+      }
+    }
+
+    return store.loggedInGroup.name
   })
 
   const tasks = ref([])

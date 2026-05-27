@@ -437,19 +437,46 @@
   })
 
   const tableRef = ref()
+  const isTableMounted = ref(false)
+
+  const activeGroupId = computed(() => {
+    const group = loginStore.loggedInGroup
+    if(!group || typeof group !== 'object' || !('id' in group)) {
+      return null
+    }
+    return group.id
+  })
+
+  function getCacheKey(groupId = activeGroupId.value) {
+    return `${route.path}::group:${groupId ?? 'none'}`
+  }
+
   onMounted(() => {
     // Restore cached pagination when arriving via back; otherwise use defaults
-    const key = route.path
-    const cached = loginStore.tablePaginationCache[key]
+    const key = getCacheKey()
+    const legacyKey = route.path
+    const cached = loginStore.tablePaginationCache[key] ?? loginStore.tablePaginationCache[legacyKey]
     if (route.meta.backButton && cached) {
       pagination.value = { ...pagination.value, ...cached }
       showDeleted.value = cached.showDeleted
       filter.value = cached.search
     } else if(cached) {
       delete loginStore.tablePaginationCache[key]
+      delete loginStore.tablePaginationCache[legacyKey]
     }
+    isTableMounted.value = true
     // get initial data from server with current pagination
     tableRef.value.requestServerInteraction()
+  })
+
+  watch(activeGroupId, (newGroupId, oldGroupId) => {
+    if(!isTableMounted.value || newGroupId === oldGroupId) {
+      return
+    }
+
+    selected.value = []
+    pagination.value.page = 1
+    refreshTable()
   })
 
   defineExpose({ refreshTable, updateTotalRows })
@@ -521,14 +548,12 @@
     return ''
   }
 
-  const path = route.path
-
   onBeforeUnmount(() => {
     invalidSearchNotification()
 
     // cache current pagination keyed by route path
     if(props.preserveSort) {
-      loginStore.tablePaginationCache[path] = {
+      loginStore.tablePaginationCache[getCacheKey()] = {
         page: pagination.value.page,
         rowsPerPage: pagination.value.rowsPerPage,
         sortBy: pagination.value.sortBy,
