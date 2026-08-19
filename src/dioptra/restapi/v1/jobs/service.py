@@ -373,6 +373,7 @@ class JobService(object):
                 job_swap = models.JobSwap(
                     swap_name=swap["swap_name"],
                     task_alias=swap["task_alias"],
+                    task_name=retrieved["task_name"],
                 )
                 job_swap.plugin_file_resource_snapshot_id = retrieved[
                     "plugin_file_resource_snapshot_id"

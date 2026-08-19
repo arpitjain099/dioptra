@@ -177,6 +177,7 @@ class JobSwap(db.Model):  # type: ignore[name-defined]
     )
     swap_name: Mapped[text_]
     task_alias: Mapped[text_]
+    task_name: Mapped[optionalstr]
     plugin_file_resource_snapshot_id: Mapped[bigint] = mapped_column(
         ForeignKey("plugin_files.resource_snapshot_id"),
         init=False,

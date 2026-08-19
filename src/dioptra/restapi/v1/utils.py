@@ -808,6 +808,7 @@ def build_job(job_dict: JobDict) -> dict[str, Any]:
             {
                 "swap_name": swap.swap_name,
                 "task_alias": swap.task_alias,
+                "task_name": swap.task_name,
                 "plugin_file_resource_snapshot_id": swap.plugin_file_resource_snapshot_id,
             }
             for swap in sorted(job.job_swaps, key=lambda swap: swap.swap_name)
